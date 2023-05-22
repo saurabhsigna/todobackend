@@ -3,7 +3,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const createPost = async (req, res) => {
-  let authorId = "6468f2b0b53524dde254ad05";
+  const { authorId } = req.body;
   const newPost = await prisma.post.create({
     data: {
       title: "My First Post",

@@ -32,3 +32,26 @@ enum Provider {
   LOCAL
   GOOGLE
 }
+
+model List {
+  id    String    @id @default(auto())  @map("_id")   @db.ObjectId
+  name  String
+   createdAt DateTime @default(now()) @map("createdAt")
+  tasks Task[] 
+}
+
+model Task {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  completed TaskStatus @default(TODO)
+  listId    String?  @db.ObjectId
+   createdAt DateTime @default(now()) @map("createdAt")
+  list      List?   @relation(fields: [listId], references: [id])
+}
+
+
+enum TaskStatus {
+  TODO
+  DOING
+  DONE
+}
