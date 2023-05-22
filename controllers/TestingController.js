@@ -75,6 +75,8 @@ const updateTaskInList = async (req, res) => {
 
 const addList = async (req, res) => {
   const { name } = req.body;
+  const authorId = req.user.id;
+  console.log("id is ", authorId);
   try {
     if (!name) {
       res.status(400).send("not name selected");
@@ -82,6 +84,7 @@ const addList = async (req, res) => {
     const list = await prisma.list.create({
       data: {
         name,
+        author: { connect: { id: authorId } },
       },
     });
     res.json(list);

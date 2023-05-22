@@ -34,8 +34,7 @@ app.get("/", (req, res) => {
 
 // Profile page (protected route)
 app.get("/profile", (req, res) => {
-  // Access user information from req.user
-  res.send(`Welcome, ${req.user.displayName}!`);
+  res.send("hello");
 });
 app.get(
   "/protected",

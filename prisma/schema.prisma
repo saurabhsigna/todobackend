@@ -14,9 +14,11 @@ model User {
   fullName  String
   email     String   @unique
   createdAt DateTime @default(now()) @map("createdAt")
-  password  String
+  password  String?
   posts     Post[]
+  lists     List[]
   provider  Provider
+  imgUri    String?
 }
 
 model Post {
@@ -38,6 +40,8 @@ model List {
   name  String
    createdAt DateTime @default(now()) @map("createdAt")
   tasks Task[] 
+   author User  @relation(fields: [authorId], references: [id])
+ authorId   String @db.ObjectId
 }
 
 model Task {

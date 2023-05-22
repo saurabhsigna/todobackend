@@ -16,8 +16,10 @@ const jwtOptions = {
 };
 
 passport.use(
-  new JwtStrategy(jwtOptions, (jwtPayload, done) => {
-    const user = getUserFromDatabase(jwtPayload.id);
+  new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
+    const user = await getUserFromDatabase(jwtPayload.id);
+    console.log("user is ");
+    console.log(user);
     if (user) {
       done(null, user);
     } else {
@@ -33,13 +35,45 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: "https://98ywwr-3000.csb.app/auth/google/callback",
     },
-    (accessToken, refreshToken, profile, done) => {
-      console.log(profile);
-      
-      // Handle user authentication and authorization
-      // You can create or update the user in your database here
-      // Call done() to indicate the authentication process is complete
-      done(null, profile);
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        // Find the user in the database based on the email
+        // console.log(profile);
+        const user = await prisma.user.findUnique({
+          where: { email: profile.emails[0].value },
+        });
+
+        if (user) {
+          // User already exists, generate a JWT token
+          const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET);
+
+          // Call done() with the existing user and the token
+          done(null, { user, token });
+        } else {
+          // User doesn't exist, create a new user in the database
+          const newUser = await prisma.user.create({
+            data: {
+              fullName: profile.displayName,
+              email: profile.emails[0].value,
+              provider: "GOOGLE",
+              imgUri: profile.photos[0].value,
+              // Add any other relevant user information from the profile object
+            },
+          });
+
+          // Generate a JWT token for the new user
+          const token = jwt.sign(
+            { userId: newUser.id },
+            process.env.JWT_SECRET
+          );
+
+          // Call done() with the new user and the token
+          done(null, { user: newUser, token });
+        }
+      } catch (error) {
+        // Handle any errors that occurred during user retrieval or creation
+        done(error, null);
+      }
     }
   )
 );
@@ -86,6 +120,11 @@ async function getUserFromDatabase(userId) {
     const user = await prisma.user.findUnique({
       where: {
         id: userId,
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
       },
     });
 

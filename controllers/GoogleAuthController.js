@@ -14,6 +14,7 @@ const googleCallback = passport.authenticate("google", {
 
 // Redirect or respond with data after successful authentication
 const googleCallbackHandler = (req, res) => {
+  console.log(req.user.token);
   res.redirect("/profile");
 };
 
