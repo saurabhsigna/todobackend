@@ -38,11 +38,13 @@ const registerController = async (req, res) => {
       },
     });
 
-    const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+    const access_token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
+      expiresIn: "1m",
     });
-
-    res.json({ token });
+   const refresh_token = jwt.sign({id:newUser.id},process.env.REFRESH_TOKEN_SECRET,{
+     expiresIn:"30d"
+   })
+    res.json({ access_token,refresh_token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "An error occurred during registration" });
@@ -67,11 +69,14 @@ const loginController = (req, res, next) => {
           .status(500)
           .json({ message: "An error occurred during login" });
       }
-      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-        expiresIn: "15m",
+      const access_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+        expiresIn: "1m",
       });
 
-      return res.status(200).json({ message: token });
+  const refresh_token = jwt.sign({ id: user.id }, process.env.REFRESH_TOKEN_SECRET, {
+        expiresIn: "30d",
+      });
+      return res.status(200).json({ message: {access_token,refresh_token} });
     });
   })(req, res, next);
 };

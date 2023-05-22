@@ -1,6 +1,8 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-
+const verifyRefreshToken = require("../functions/token/VerifyRefreshToken");
+const signAccessToken = require("../functions/token/SignAccessToken");
+const signRefreshToken = require("../functions/token/SignRefreshToken");
 const addTaskToList = async (req, res) => {
   const { listId, name } = req.body;
 
@@ -112,9 +114,29 @@ const getList = async (req, res) => {
     res.status(500).send("server error");
   }
 };
+
+const refreshToken = async (req, res, next) => {
+  try {
+    const refreshToken = req.body.hello;
+    console.log(refreshToken);
+    if (!refreshToken) {
+      res.status(400).send("badRequest");
+    }
+    const userPayload = await verifyRefreshToken.verifyRefreshToken(
+      refreshToken
+    );
+
+    const accessToken = await signAccessToken.signRefreshToken(userPayload.id);
+    const refToken = await signRefreshToken.signRefreshToken(userPayload.id);
+    res.send({ accessToken: accessToken, refreshToken: refToken });
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = {
   addTaskToList,
   addList,
   getList,
   updateTaskInList,
+  refreshToken,
 };

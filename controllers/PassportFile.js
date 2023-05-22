@@ -35,6 +35,7 @@ passport.use(
     },
     (accessToken, refreshToken, profile, done) => {
       console.log(profile);
+      
       // Handle user authentication and authorization
       // You can create or update the user in your database here
       // Call done() to indicate the authentication process is complete

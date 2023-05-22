@@ -8,4 +8,5 @@ router.post("/addtask", testController.addTaskToList);
 router.post("/createlist", testController.addList);
 router.get("/getlist", testController.getList);
 router.post("/updatetask", testController.updateTaskInList);
+router.post("/refreshtoken", testController.refreshToken);
 module.exports = router;
