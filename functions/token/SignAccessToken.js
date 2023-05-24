@@ -10,7 +10,7 @@ const signRefreshToken =async (userId)=>{
     // You can include any additional claims here as well
   };
   const options = {
-    expiresIn: '1m' // Set the desired expiration time
+    expiresIn: process.env.ACCESS_TOKEN_EXPIRESIN  // Set the desired expiration time
   };
   const token = await signAsync(payload, process.env.JWT_SECRET, options);
   return token;

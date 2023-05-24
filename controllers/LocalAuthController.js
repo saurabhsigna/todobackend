@@ -39,12 +39,16 @@ const registerController = async (req, res) => {
     });
 
     const access_token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
-      expiresIn: "1m",
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRESIN,
     });
-   const refresh_token = jwt.sign({id:newUser.id},process.env.REFRESH_TOKEN_SECRET,{
-     expiresIn:"30d"
-   })
-    res.json({ access_token,refresh_token });
+    const refresh_token = jwt.sign(
+      { id: newUser.id },
+      process.env.REFRESH_TOKEN_SECRET,
+      {
+        expiresIn: "30d",
+      }
+    );
+    res.json({ access_token, refresh_token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "An error occurred during registration" });
@@ -54,6 +58,7 @@ const registerController = async (req, res) => {
 const loginController = (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
+      console.error(err);
       return res
         .status(500)
         .json({ message: "An error occurred during login" });
@@ -70,13 +75,17 @@ const loginController = (req, res, next) => {
           .json({ message: "An error occurred during login" });
       }
       const access_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-        expiresIn: "1m",
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRESIN,
       });
 
-  const refresh_token = jwt.sign({ id: user.id }, process.env.REFRESH_TOKEN_SECRET, {
-        expiresIn: "30d",
-      });
-      return res.status(200).json({ message: {access_token,refresh_token} });
+      const refresh_token = jwt.sign(
+        { id: user.id },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+          expiresIn: "30d",
+        }
+      );
+      return res.status(200).json({ message: { access_token, refresh_token } });
     });
   })(req, res, next);
 };

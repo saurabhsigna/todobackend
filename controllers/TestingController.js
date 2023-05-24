@@ -5,14 +5,22 @@ const signAccessToken = require("../functions/token/SignAccessToken");
 const signRefreshToken = require("../functions/token/SignRefreshToken");
 const addTaskToList = async (req, res) => {
   const { listId, name } = req.body;
+  const authorId = req.user.id;
 
   try {
     // Check if the list exists
-    const list = await prisma.list.findUnique({
-      where: { id: listId },
-      include: { tasks: true },
+    const list1 = await prisma.user.findUnique({
+      where: { id: authorId },
+      select: {
+        id: true,
+        lists: {
+          include: { tasks: true },
+          where: { id: listId },
+        },
+      },
     });
-    if (!list) {
+
+    if (!list1.lists.length > 0) {
       return res.status(404).json({ error: "List not found" });
     }
 
@@ -24,19 +32,22 @@ const addTaskToList = async (req, res) => {
         list: { connect: { id: listId } },
       },
     });
-    const existingTasks = list.tasks.map((task) => ({ id: task.id }));
+    const existingTasks = list1.lists[0].tasks.map((task) => ({ id: task.id }));
     const updatedTasks = [...existingTasks, { id: task.id }];
     console.log("updated array : ");
     console.log(updatedTasks);
     // Update the tasks array in the list
-    const updatedList = await prisma.list.update({
-      where: { id: listId },
-      data: {
-        tasks: {
-          set: updatedTasks,
+    if (list1.id) {
+      console.log(list1.lists[0].id);
+      const updatedList = await prisma.list.update({
+        where: { id: listId },
+        data: {
+          tasks: {
+            set: updatedTasks,
+          },
         },
-      },
-    });
+      });
+    }
 
     res.status(200).json({ message: "Task added to the list", task });
   } catch (error) {
@@ -46,11 +57,21 @@ const addTaskToList = async (req, res) => {
 };
 const updateTaskInList = async (req, res) => {
   const { listId, taskId, name, completed } = req.body;
-
+  const authorId = req.user.id;
   try {
     // Check if the list exists
-    const list = await prisma.list.findUnique({ where: { id: listId } });
-    if (!list) {
+    const list = await prisma.user.findUnique({
+      where: { id: authorId },
+      select: {
+        id: true,
+        lists: {
+          include: { tasks: true },
+          where: { id: listId },
+        },
+      },
+    });
+
+    if (!list.lists.length > 0) {
       return res.status(404).json({ error: "List not found" });
     }
 
@@ -61,10 +82,12 @@ const updateTaskInList = async (req, res) => {
     }
 
     // Update the task
-    const updatedTask = await prisma.task.update({
-      where: { id: taskId },
-      data: { name, completed },
-    });
+    if (list.id) {
+      const updatedTask = await prisma.task.update({
+        where: { id: taskId },
+        data: { name, completed },
+      });
+    }
 
     res.status(200).json({ message: "Task updated", task: updatedTask });
   } catch (error) {
@@ -93,27 +116,40 @@ const addList = async (req, res) => {
   }
 };
 const getList = async (req, res) => {
+  const authorId = req.user.id;
   const { listId } = req.body;
+
   try {
     if (!listId) {
       res.status(400).send("listId notFound");
     } else {
-      const list = await prisma.list.findUnique({
-        where: { id: listId },
-        include: {
-          tasks: {
-            select: {
-              id: true,
-              name: true,
-              completed: true,
-              listId: true,
-            },
+      // const list = await prisma.list.findUnique({
+      //   where: { id: listId },
+      //   include: {
+      //     tasks: {
+      //       select: {
+      //         id: true,
+      //         name: true,
+      //         completed: true,
+      //         listId: true,
+      //       },
+      //     },
+      //   },
+      // });
+      const dd = await prisma.user.findUnique({
+        where: { id: authorId },
+        select: {
+          id: true,
+          lists: {
+            where: { id: listId },
           },
         },
       });
-      res.json(list);
+      console.log(dd);
+      res.json(dd);
     }
   } catch (error) {
+    console.log(error.message);
     res.status(500).send("server error");
   }
 };
