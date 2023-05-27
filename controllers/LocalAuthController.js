@@ -7,7 +7,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const registerController = async (req, res) => {
-  const { email, password, fullName } = req.body;
+  const { email, password, fullName ,imgUri} = req.body;
 
   try {
     // Validate user input
@@ -23,6 +23,7 @@ const registerController = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
+    
 
     // Hash the password
     const salt = await bcrypt.genSalt(10);
@@ -32,6 +33,7 @@ const registerController = async (req, res) => {
     const newUser = await prisma.user.create({
       data: {
         fullName,
+        imgUri,
         email,
         password: hashedPassword,
         provider: "LOCAL",

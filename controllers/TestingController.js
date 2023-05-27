@@ -8,7 +8,6 @@ const addTaskToList = async (req, res) => {
   const authorId = req.user.id;
 
   try {
-    // Check if the list exists
     const list1 = await prisma.user.findUnique({
       where: { id: authorId },
       select: {
@@ -24,11 +23,9 @@ const addTaskToList = async (req, res) => {
       return res.status(404).json({ error: "List not found" });
     }
 
-    // Create the task and associate it with the list
     const task = await prisma.task.create({
       data: {
         name,
-
         list: { connect: { id: listId } },
       },
     });
@@ -36,9 +33,9 @@ const addTaskToList = async (req, res) => {
     const updatedTasks = [...existingTasks, { id: task.id }];
     console.log("updated array : ");
     console.log(updatedTasks);
-    // Update the tasks array in the list
     if (list1.id) {
       console.log(list1.lists[0].id);
+
       const updatedList = await prisma.list.update({
         where: { id: listId },
         data: {
@@ -55,11 +52,11 @@ const addTaskToList = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
 const updateTaskInList = async (req, res) => {
   const { listId, taskId, name, completed } = req.body;
   const authorId = req.user.id;
   try {
-    // Check if the list exists
     const list = await prisma.user.findUnique({
       where: { id: authorId },
       select: {
@@ -75,13 +72,11 @@ const updateTaskInList = async (req, res) => {
       return res.status(404).json({ error: "List not found" });
     }
 
-    // Check if the task exists within the list
     const task = await prisma.task.findUnique({ where: { id: taskId } });
     if (!task || task.listId !== listId) {
       return res.status(404).json({ error: "Task not found in the list" });
     }
 
-    // Update the task
     if (list.id) {
       const updatedTask = await prisma.task.update({
         where: { id: taskId },
@@ -100,16 +95,19 @@ const addList = async (req, res) => {
   const { name } = req.body;
   const authorId = req.user.id;
   console.log("id is ", authorId);
+
   try {
     if (!name) {
       res.status(400).send("not name selected");
     }
+
     const list = await prisma.list.create({
       data: {
         name,
         author: { connect: { id: authorId } },
       },
     });
+
     res.json(list);
   } catch (error) {
     res.status(500).json({ error: "Server error" });
@@ -118,25 +116,11 @@ const addList = async (req, res) => {
 const getList = async (req, res) => {
   const authorId = req.user.id;
   const { listId } = req.body;
-
   try {
     if (!listId) {
       res.status(400).send("listId notFound");
     } else {
-      // const list = await prisma.list.findUnique({
-      //   where: { id: listId },
-      //   include: {
-      //     tasks: {
-      //       select: {
-      //         id: true,
-      //         name: true,
-      //         completed: true,
-      //         listId: true,
-      //       },
-      //     },
-      //   },
-      // });
-      const dd = await prisma.user.findUnique({
+      const listContent = await prisma.user.findUnique({
         where: { id: authorId },
         select: {
           id: true,
@@ -145,11 +129,58 @@ const getList = async (req, res) => {
           },
         },
       });
-      console.log(dd);
-      res.json(dd);
+
+      console.log(listContent);
+      res.json(listContent);
     }
   } catch (error) {
     console.log(error.message);
+    res.status(500).send("server error");
+  }
+};
+const getUserLists = async (req, res) => {
+  const authorId = req.user.id;
+
+  try {
+    if (authorId) {
+      const lists = await prisma.list.findMany({
+        where: { authorId: authorId },
+        include: {
+          tasks: {
+            select: {
+              name: true,
+            },
+            take: 3, // Limit the number of tasks to 5
+            orderBy: { createdAt: "desc" }, // Order tasks by createdAt in descending order
+          },
+        },
+      });
+
+      console.log(lists);
+      res.json(lists);
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send("server error");
+  }
+};
+const getUserInfo = async (req, res) => {
+  const authorId = req.user.id;
+
+  try {
+    const userInfo = await prisma.user.findUnique({
+      where: { id: authorId },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        imgUri: true,
+      },
+    });
+
+    res.json(userInfo);
+  } catch (error) {
+    console.error(error.message);
     res.status(500).send("server error");
   }
 };
@@ -178,4 +209,6 @@ module.exports = {
   getList,
   updateTaskInList,
   refreshToken,
+  getUserLists,
+  getUserInfo,
 };

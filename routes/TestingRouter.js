@@ -15,6 +15,11 @@ router.post(
   testController.addList
 );
 router.get(
+  "/me",
+  passport.authenticate("jwt", { session: false }),
+  testController.getUserInfo
+);
+router.get(
   "/getlist",
   passport.authenticate("jwt", { session: false }),
   testController.getList
@@ -23,6 +28,11 @@ router.post(
   "/updatetask",
   passport.authenticate("jwt", { session: false }),
   testController.updateTaskInList
+);
+router.get(
+  "/getlists",
+  passport.authenticate("jwt", { session: false }),
+  testController.getUserLists
 );
 router.post("/refreshtoken", testController.refreshToken);
 module.exports = router;

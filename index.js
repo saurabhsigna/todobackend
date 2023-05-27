@@ -2,6 +2,7 @@ const express = require("express");
 const session = require("express-session");
 const passport = require("./controllers/PassportFile");
 const dotenv = require("dotenv");
+const cors = require("cors");
 const authRoutes = require("./routes/GoogleAuthRouter");
 const userRoutes = require("./routes/UserRouter");
 const postRoutes = require("./routes/PostRouter");
@@ -9,6 +10,12 @@ const localRoutes = require("./routes/LocalAuthRouter");
 const testingRoutes = require("./routes/TestingRouter");
 const app = express();
 
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URI,
+    credentials: true,
+  })
+);
 dotenv.config();
 
 // Set up session middleware
