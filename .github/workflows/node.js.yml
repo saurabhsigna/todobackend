@@ -29,7 +29,7 @@ jobs:
 
     steps:
     - name: Create env file
-      run: |
+    - run: |
          touch .env
          echo JWT_SECRET=${JWT_SECRET} >> .env
          echo ACCESS_TOKEN_EXPIRESIN=${ACCESS_TOKEN_EXPIRESIN} >> .env
