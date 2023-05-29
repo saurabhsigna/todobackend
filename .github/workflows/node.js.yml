@@ -39,7 +39,7 @@ jobs:
            echo GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} >> .env
            echo REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET} >> .env
            echo SESSION_SECRET=${SESSION_SECRET} >> .env
-         cat .env
+           cat .env
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
