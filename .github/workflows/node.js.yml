@@ -29,16 +29,16 @@ jobs:
 
     steps:
     - name: Create env file
-    - run: 
-         touch .env
-         echo JWT_SECRET=${JWT_SECRET} >> .env
-         echo ACCESS_TOKEN_EXPIRESIN=${ACCESS_TOKEN_EXPIRESIN} >> .env
-         echo DATABASE_URL=${DATABASE_URL} >> .env
-         echo FRONTEND_URI=${FRONTEND_URI} >> .env
-         echo GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET} >> .env
-         echo GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} >> .env
-         echo REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET} >> .env
-         echo SESSION_SECRET=${SESSION_SECRET} >> .env
+   
+    - run: touch .env
+           echo JWT_SECRET=${JWT_SECRET} >> .env
+           echo ACCESS_TOKEN_EXPIRESIN=${ACCESS_TOKEN_EXPIRESIN} >> .env
+           echo DATABASE_URL=${DATABASE_URL} >> .env
+           echo FRONTEND_URI=${FRONTEND_URI} >> .env
+           echo GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET} >> .env
+           echo GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} >> .env
+           echo REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET} >> .env
+           echo SESSION_SECRET=${SESSION_SECRET} >> .env
          cat .env
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
