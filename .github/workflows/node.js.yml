@@ -37,7 +37,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm ci
-    - run: touch .env
+    - run:  |
+           touch .env
            echo JWT_SECRET=${JWT_SECRET} >> .env
            echo ACCESS_TOKEN_EXPIRESIN=${ACCESS_TOKEN_EXPIRESIN} >> .env
            echo DATABASE_URL=${DATABASE_URL} >> .env
