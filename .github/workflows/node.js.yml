@@ -9,6 +9,7 @@ on:
   pull_request:
     branches: [ "main" ]
 env:
+  PORT: ${{secrets.PORT}}
   JWT_SECRET: ${{secrets.JWT_SECRET}}
   ACCESS_TOKEN_EXPIRESIN: ${{secrets.ACCESS_TOKEN_EXPIRESIN}}
   DATABASE_URL: ${{secrets.DATABASE_URL}}
@@ -39,6 +40,7 @@ jobs:
     - run: npm ci
     - run:  |
            touch .env
+           echo PORT=${PORT} >> .env
            echo JWT_SECRET=${JWT_SECRET} >> .env
            echo ACCESS_TOKEN_EXPIRESIN=${ACCESS_TOKEN_EXPIRESIN} >> .env
            echo DATABASE_URL=${DATABASE_URL} >> .env
