@@ -68,7 +68,7 @@ jobs:
           sleep 1
           if [ -f logs.txt ]; then
             echo "Logs captured successfully"
-            kill -INT %1 # Send SIGINT to the pm2 logs process
+            pkill -f "pm2 logs" # Stop the pm2 logs process
             break
           fi
         done
