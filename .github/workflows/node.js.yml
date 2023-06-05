@@ -74,3 +74,14 @@ jobs:
         done
     - name: Display logs
       run: cat logs.txt
+      
+    - name: Check server status
+      run: |
+          if ! curl --head --fail http://localhost:$PORT; then
+            echo "Server is not running successfully. Rolling back..."
+            # Your rollback commands here
+            # For example: pm2 revert app
+            exit 1
+          fi
+    
+    
