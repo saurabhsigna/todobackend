@@ -59,7 +59,7 @@ jobs:
       run: pm2 restart todobackend || echo "PM2 restart failed"
 
     - name: Check PM2 logs
-      run: pm2 logs --raw  > logs.txt &
+      run: pm2 logs todobackend --raw  > logs.txt &
 
     - name: Wait for logs and stop gracefully
       run: |
@@ -72,3 +72,5 @@ jobs:
             break
           fi
         done
+    - name: Display logs
+      run: cat logs.txt
