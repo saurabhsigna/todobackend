@@ -57,28 +57,31 @@ jobs:
     - name: Remove previous logs
       run: pm2 flush todobackend
 
-    - name: Start PM2 server and wait for accessibility
-      run: |
-        pm2 restart todobackend || echo "PM2 restart failed"
+    - name: Start PM2 server
+      run: pm2 start npm --name "todobackend" -- run start
 
-        timeout=120
-        while [[ $timeout -gt 0 ]]; do
+    - name: Wait for server to become accessible
+      run: |
+        retries=0
+        max_retries=12
+        while true; do
           if curl --head --fail http://localhost:3005; then
-            echo "Server is running successfully."
+            echo "Server is running and accessible."
             break
+          fi
+
+          if [[ $retries -eq $max_retries ]]; then
+            echo "Server did not become accessible within the specified number of retries. Rolling back..."
+            # Your rollback commands here
+            # For example: pm2 revert app
+            pm2 logs todobackend --nostream
+            exit 1
           fi
 
           echo "Waiting for server to become accessible..."
           sleep 5
-          timeout=$((timeout - 5))
+          retries=$((retries + 1))
         done
-
-        if [[ $timeout -eq 0 ]]; then
-          echo "Server did not become accessible within the specified timeout. Rolling back..."
-          # Your rollback commands here
-          # For example: pm2 revert app
-          exit 1
-        fi
 
     - name: Check PM2 logs
       run: pm2 logs todobackend --nostream
@@ -88,6 +91,4 @@ jobs:
         if ! curl --head --fail http://localhost:3005; then
           echo "Server is not running successfully. Rolling back..."
           # Your rollback commands here
-          # For example: pm2 revert app
-          exit 1
-        fi
+          # For
