@@ -59,21 +59,9 @@ jobs:
       run: pm2 restart todobackend || echo "PM2 restart failed"
 
     - name: Check PM2 logs
-      run: pm2 logs todobackend --raw  > logs.txt &
+      run: pm2 logs todobackend --nostream
 
-    - name: Wait for logs and stop gracefully
-      run: |
-        timeout=120 # Duration in seconds
-        for ((i=0; i<$timeout; i++)); do
-          sleep 1
-          if [ -f logs.txt ]; then
-            echo "Logs captured successfully"
-            pkill -f "pm2 logs" # Stop the pm2 logs process
-            break
-          fi
-        done
-    - name: Display logs
-      run: cat logs.txt
+
       
     - name: Check server status
       run: |
