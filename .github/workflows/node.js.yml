@@ -59,7 +59,7 @@ jobs:
       run: pm2 restart todobackend || echo "PM2 restart failed"
 
     - name: Check PM2 logs
-      run: pm2 logs --lines 100 --raw > logs.txt &
+      run: pm2 logs --lines 100 --raw --time 'YYYY-MM-DD HH:mm:ss' > logs.txt &
 
     - name: Wait for logs and stop gracefully
       run: |
