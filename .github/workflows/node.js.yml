@@ -59,4 +59,16 @@ jobs:
       run: pm2 restart todobackend || echo "PM2 restart failed"
 
     - name: Check PM2 logs
-      run: pm2 logs
+      run: pm2 logs --lines 100 --raw > logs.txt &
+
+    - name: Wait for logs and stop gracefully
+      run: |
+        timeout=120 # Duration in seconds
+        for ((i=0; i<$timeout; i++)); do
+          sleep 1
+          if [ -f logs.txt ]; then
+            echo "Logs captured successfully"
+            kill -INT %1 # Send SIGINT to the pm2 logs process
+            break
+          fi
+        done
