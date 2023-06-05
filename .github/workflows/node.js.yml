@@ -77,7 +77,7 @@ jobs:
       
     - name: Check server status
       run: |
-          if ! curl --head --fail http://localhost:$PORT; then
+          if ! curl --head --fail http://localhost:3005; then
             echo "Server is not running successfully. Rolling back..."
             # Your rollback commands here
             # For example: pm2 revert app
