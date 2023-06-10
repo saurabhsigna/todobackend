@@ -36,7 +36,7 @@ app.use(passport.session());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("testing 7 ");
+  res.send("testing 78 ");
 });
 
 // Profile page (protected route)
